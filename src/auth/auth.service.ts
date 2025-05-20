@@ -10,6 +10,7 @@ import { faker } from '@faker-js/faker';
 import { hash, verify } from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
+import cryptoRandomString from 'crypto-random-string';
 
 @Injectable()
 export class AuthService {
@@ -60,10 +61,13 @@ export class AuthService {
 		const user = await this.prisma.user.create({
 			data: {
 				email: dto.email,
+				code: cryptoRandomString({ length: 6 }),
 				name: faker.person.firstName(),
 				password: await hash(dto.password)
 			}
 		});
+
+		// todo: Отправка письма
 
 		const tokens = await this.issueTokens(user.id);
 
@@ -85,6 +89,21 @@ export class AuthService {
 		});
 
 		return { accessToken, refreshToken };
+	}
+
+	async checkCode(code: string) {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				code: code
+			}
+		});
+
+		if (!user) throw new NotFoundException(`Invalid code: ${code}`);
+
+		return this.prisma.user.update({
+			where: { code: code },
+			data: { emailConfirm: true }
+		});
 	}
 
 	private returnUserFields(user: User) {

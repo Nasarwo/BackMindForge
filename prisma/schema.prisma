@@ -8,14 +8,59 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   email     String   @unique
   password  String   
+  code      String   @unique
 
   name      String   @unique
+  chats     Chat[]
+
+  emailConfirm Boolean @default(false)
 
   @@map("users")
+}
+
+model Chat {
+  id        String   @id @default(uuid())
+  title     String   @default("Новый чат")
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  neuralNetworkId    String @map("neural_network_id")
+  neuralNetwork      NeuralNetwork @relation(fields: [neuralNetworkId], references: [id])
+  messages  Message[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@map("chats")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  role      EnumRole @default(USER)
+  chatId    String @map("chat_id")
+  chat      Chat   @relation(fields: [chatId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("messages")
+}
+
+model NeuralNetwork {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  description String?
+  chats     Chat[]
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("neural_networks")
+}
+
+enum EnumRole {
+  USER
+  ASSISTANT
+  SYSTEM
 }

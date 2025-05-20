@@ -1,7 +1,9 @@
 import {
 	Body,
 	Controller,
+	Get,
 	HttpCode,
+	Param,
 	Post,
 	UsePipes,
 	ValidationPipe
@@ -9,6 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { Auth } from './decorators/auth.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +27,7 @@ export class AuthController {
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Post('login/access-token')
+	@Auth()
 	async getNewTokens(@Body() dto: RefreshTokenDto) {
 		return this.authService.getNewTokens(dto.refreshToken);
 	}
@@ -33,5 +37,11 @@ export class AuthController {
 	@Post('register')
 	async register(@Body() dto: AuthDto) {
 		return this.authService.register(dto);
+	}
+
+	@HttpCode(200)
+	@Get(':code')
+	async checkCode(@Param('code') code: string) {
+		return this.authService.checkCode(code);
 	}
 }
