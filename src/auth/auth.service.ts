@@ -67,8 +67,6 @@ export class AuthService {
 			}
 		});
 
-		// todo: Отправка письма
-
 		const tokens = await this.issueTokens(user.id);
 
 		return {

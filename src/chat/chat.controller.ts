@@ -41,6 +41,11 @@ export class ChatController {
 		return this.chatService.updateChat(userId, chatId, dto);
 	}
 
+	@Get(':chatId')
+	async getAllMessages(@Param('chatId') chatId: string) {
+		return this.chatService.getAllMessages(chatId);
+	}
+
 	@Post(':chatId/messages')
 	async sendMessage(
 		@Request() req,

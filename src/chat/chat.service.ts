@@ -4,9 +4,7 @@ import {
 	UnauthorizedException
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateChatDto } from './dto/create-chat.dto';
 import { SendMessageDto } from './dto/send-message.dto';
-import { MessageRole } from './dto/send-message.dto';
 import { updateChatDto } from './dto/update-chat.dto';
 
 @Injectable()
@@ -20,14 +18,24 @@ export class ChatService {
 	async getUserChats(userId: string) {
 		return this.prisma.chat.findMany({
 			where: { userId },
-			include: {
-				messages: {
-					orderBy: { createdAt: 'asc' },
-					take: 20 // Пагинация: последние 20 сообщений
-				},
-				neuralNetwork: true
-			},
-			orderBy: { updatedAt: 'desc' } // Сначала новые чаты
+			orderBy: { updatedAt: 'desc' }, // Сначала новые чаты
+			select: {
+				title: true,
+				neuralNetworkId: true,
+				updatedAt: true
+			}
+		});
+	}
+
+	async getAllMessages(chatId: string) {
+		return this.prisma.message.findMany({
+			where: { chatId },
+			orderBy: { createdAt: 'desc' },
+			select: {
+				content: true,
+				role: true,
+				createdAt: true
+			}
 		});
 	}
 
