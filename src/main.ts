@@ -13,6 +13,6 @@ async function bootstrap() {
 			forbidNonWhitelisted: true // Бросает ошибку, если есть лишние поля
 		})
 	);
-	await app.listen(4200);
+	await app.listen(4200, '0.0.0.0');
 }
 bootstrap();
