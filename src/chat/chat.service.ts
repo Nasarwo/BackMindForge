@@ -20,6 +20,7 @@ export class ChatService {
 			where: { userId },
 			orderBy: { updatedAt: 'desc' }, // Сначала новые чаты
 			select: {
+				id: true,
 				title: true,
 				neuralNetworkId: true,
 				updatedAt: true
